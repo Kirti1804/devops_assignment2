@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    environment {
+        BACKEND_IMAGE = 'mern-backend'
+        FRONTEND_IMAGE = 'mern-frontend'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    sh 'docker-compose build'
+                }
+            }
+        }
+
+        stage('Run Docker Containers') {
+            steps {
+                script {
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+
+        stage('Verify Containers') {
+            steps {
+                script {
+                    sh 'docker ps'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment completed successfully!"
+        }
+        failure {
+            echo "Deployment failed. Check the logs!"
+        }
+    }
+}
